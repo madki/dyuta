@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b0b10" />
+    <meta name="description" content="dyuta — a new game studio. Coming soon." />
+    <title>dyuta — coming soon</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      *,*::before,*::after { box-sizing: border-box; }
+      html,body { margin: 0; padding: 0; }
+      html { background: #0b0b10; color: #f4f1ea; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+        font-feature-settings: "ss01","cv11";
+        min-height: 100svh;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+      main { max-width: 56rem; margin: 0 auto; padding: clamp(1.5rem, 4vw, 3rem); }
+      .hero { min-height: 78svh; display: flex; flex-direction: column; justify-content: center; gap: 1.25rem; }
+      .wordmark {
+        font-size: clamp(4rem, 16vw, 9rem);
+        font-weight: 300;
+        letter-spacing: -0.04em;
+        line-height: 0.9;
+        margin: 0;
+      }
+      .wordmark .dot { color: #d97a3c; }
+      .tag {
+        font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+        color: #b9b3a6;
+        max-width: 32ch;
+        margin: 0;
+      }
+      .contact { margin-top: auto; display: flex; gap: 1.25rem; align-items: baseline; flex-wrap: wrap; }
+      .contact a {
+        color: #f4f1ea;
+        text-decoration: none;
+        border-bottom: 1px solid #4a4538;
+        padding-bottom: 2px;
+        transition: border-color 120ms ease;
+      }
+      .contact a:hover, .contact a:focus-visible { border-color: #d97a3c; outline: none; }
+      .contact .label { color: #6e6a5e; font-size: 0.875rem; letter-spacing: 0.08em; text-transform: uppercase; }
+      .play-section { padding-top: 3rem; padding-bottom: 4rem; }
+      .play-heading {
+        font-size: 1rem;
+        font-weight: 500;
+        color: #8e887a;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin: 0 0 1rem 0;
+      }
+      .game {
+        position: relative;
+        width: 100%;
+        max-width: 40rem;
+        aspect-ratio: 4 / 3;
+        background: #14141c;
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .game canvas { display: block; width: 100%; height: 100%; }
+      .game-placeholder {
+        position: absolute; inset: 0;
+        display: flex; align-items: center; justify-content: center;
+        color: #6e6a5e; font-size: 0.95rem; letter-spacing: 0.05em;
+      }
+      .game-placeholder::before {
+        content: "▶";
+        margin-right: 0.6rem;
+        color: #d97a3c;
+      }
+      .game.loaded .game-placeholder { display: none; }
+      .game-hint {
+        margin-top: 0.75rem;
+        font-size: 0.85rem;
+        color: #6e6a5e;
+      }
+      footer { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid #1d1d27; color: #6e6a5e; font-size: 0.85rem; }
+      @media (prefers-reduced-motion: reduce) {
+        * { animation: none !important; transition: none !important; }
+      }
+    </style>
+    <link rel="modulepreload" href="/src/main.ts" />
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <h1 class="wordmark">dyuta<span class="dot">.</span></h1>
+        <p class="tag">A new game studio. Something is being made. <strong>Coming soon.</strong></p>
+        <div class="contact">
+          <span class="label">Contact</span>
+          <a href="mailto:hello@dyuta.studio" id="contact-email">hello@dyuta.studio</a>
+        </div>
+      </section>
+
+      <section class="play-section">
+        <h2 class="play-heading">Play while you wait</h2>
+        <div class="game" id="game" role="application" aria-label="Bloxorz mini-game">
+          <div class="game-placeholder" id="game-placeholder">Tap to play</div>
+        </div>
+        <p class="game-hint">Roll the block to the hole. Don't fall off. Arrow keys / WASD, or tap the edges.</p>
+      </section>
+
+      <footer>© <span id="year"></span> dyuta</footer>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
