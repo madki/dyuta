@@ -14,7 +14,7 @@ import { makeBlockTexture } from './textures';
 
 const ROLL_MS = 170;
 const RESET_DELAY_MS = 600;
-const WIN_DELAY_MS = 700;
+const WIN_DELAY_MS = 500;
 
 export async function mount(container: HTMLElement): Promise<() => void> {
   const engine = createEngine(container);
@@ -29,6 +29,9 @@ export async function mount(container: HTMLElement): Promise<() => void> {
   const blockMesh = new THREE.Mesh(blockGeo, blockMat);
   blockMesh.castShadow = true;
   blockMesh.receiveShadow = false;
+  // transparent stays true so the win-animation opacity fade renders correctly;
+  // with opacity=1 it draws identically to opaque.
+  blockMat.transparent = true;
 
   // Pivot is the parent that we rotate to animate rolling.
   const pivot = new THREE.Object3D();
@@ -78,11 +81,12 @@ export async function mount(container: HTMLElement): Promise<() => void> {
     engine.scene.add(board.group);
     currentMap = m;
     state = { o: 'up', ...findStart(m) };
-    // Reset transforms
+    // Reset transforms + visibility
     pivot.position.set(0, 0, 0);
     pivot.rotation.set(0, 0, 0);
     blockMesh.position.set(0, 0, 0);
     blockMesh.rotation.set(0, 0, 0);
+    blockMat.opacity = 1;
     applyStateToMesh(blockMesh, state);
     frameToBoard();
     anim = { kind: 'idle' };
@@ -175,6 +179,8 @@ export async function mount(container: HTMLElement): Promise<() => void> {
 
         // Check win or fall
         if (state.o === 'up' && isGoal(currentMap, state.x, state.y)) {
+          // Yank the goal tile so the block sinks into a visible hole.
+          board.group.remove(board.goalMesh);
           anim = { kind: 'win', t: 0, dur: WIN_DELAY_MS / 1000 };
         } else {
           const fallDir = checkFallDirection(state);
@@ -205,8 +211,12 @@ export async function mount(container: HTMLElement): Promise<() => void> {
     } else if (anim.kind === 'win') {
       anim.t += dt;
       const u = Math.min(1, anim.t / anim.dur);
-      // Sink the block into the goal hole
-      blockMesh.position.y = -2 * u * u;
+      // Sink smoothly from the standing position (y=1) down through the hole.
+      // Fade opacity in lockstep so the block disappears exactly when the
+      // animation ends — no leftover mesh hanging around past visibility.
+      const eased = u * u; // accelerate
+      blockMesh.position.y = 1 - 3 * eased;
+      blockMat.opacity = 1 - eased;
       if (u >= 1 && !loadingNext) {
         loadingNext = true;
         const next = pickRandomMap(currentMap);

@@ -6,6 +6,7 @@ const TILE_THICKNESS = 0.2;
 
 export type Board = {
   group: THREE.Group;
+  goalMesh: THREE.Mesh;
   bounds: { minX: number; maxX: number; minZ: number; maxZ: number; cx: number; cz: number };
   dispose: () => void;
 };
@@ -22,11 +23,15 @@ export function buildBoard(map: MapDef): Board {
     roughness: 0.85,
     metalness: 0.0,
   });
-  const goalMat = new THREE.MeshStandardMaterial({
+  // Goal mesh uses multi-material so only the top face shows the ring; the
+  // sides reuse the plain tile material so it blends with the surrounding floor.
+  const goalTopMat = new THREE.MeshStandardMaterial({
     map: makeGoalTexture(),
     roughness: 0.7,
     metalness: 0.0,
   });
+  // BoxGeometry material order: [+X, -X, +Y (top), -Y, +Z, -Z].
+  const goalMats = [tileMat, tileMat, goalTopMat, tileMat, tileMat, tileMat];
 
   let count = 0;
   for (const row of map.grid) {
@@ -39,7 +44,7 @@ export function buildBoard(map: MapDef): Board {
   inst.receiveShadow = true;
 
   const goal = findGoal(map);
-  const goalMesh = new THREE.Mesh(tileGeo, goalMat);
+  const goalMesh = new THREE.Mesh(tileGeo, goalMats);
   goalMesh.receiveShadow = true;
   goalMesh.position.set(goal.x + 0.5, 0, goal.y + 0.5);
 
@@ -74,13 +79,14 @@ export function buildBoard(map: MapDef): Board {
 
   return {
     group,
+    goalMesh,
     bounds,
     dispose: () => {
       tileGeo.dispose();
       tileMat.map?.dispose();
       tileMat.dispose();
-      goalMat.map?.dispose();
-      goalMat.dispose();
+      goalTopMat.map?.dispose();
+      goalTopMat.dispose();
     },
   };
 }
